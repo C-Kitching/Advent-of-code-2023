@@ -1,10 +1,3 @@
-# read file
-file_path = "day1/day1.txt"
-file = open(file_path, "r")
-
-# store numeric parts as integers
-numeric_parts = Int[]
-
 # function to convert words to numbers
 function replace_words_with_numbers(s::AbstractString)
     s = replace(s,
@@ -30,26 +23,36 @@ end
 # function to combine first and last element in string
 firstLast(s::AbstractString) =  s[1] * s[end]
 
-# parse each line
-for line in eachline(file)
+function day1_part2()
+    # read file
+    file_path = "day1/day1.txt"
+    file = open(file_path, "r")
 
-    # convert all words to numbers
-    line_as_numbers = replace_words_with_numbers(line)
+    # store numeric parts as integers
+    numeric_parts = Int[]
 
-    # get string list of digitis
-    digit_list = String([x for x in line_as_numbers if isdigit(x)])
+    # parse each line
+    for line in eachline(file)
 
-    # get first and last numbers
-    num = parse(Int, firstLast(digit_list))
-    
-    # store number
-    push!(numeric_parts, num)
-    
+        # convert all words to numbers
+        line_as_numbers = replace_words_with_numbers(line)
+
+        # get string list of digitis
+        digit_list = String([x for x in line_as_numbers if isdigit(x)])
+
+        # get first and last numbers
+        num = parse(Int, firstLast(digit_list))
+        
+        # store number
+        push!(numeric_parts, num)
+        
+    end
+
+    # close file
+    close(file)
+
+    # print result
+    println(sum(numeric_parts))
 end
 
-# close file
-close(file)
-
-# print result
-println(sum(numeric_parts))
 
