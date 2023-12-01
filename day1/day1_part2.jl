@@ -34,8 +34,11 @@ function day1_part2()
     # parse each line
     for line in eachline(file)
 
-        # convert all words to numbers
-        line_as_numbers = replace_words_with_numbers(line)
+        # convert all words to numbers if part 2
+        # do nothing for part 1
+        part2 = false
+        modifier = part2 ? replace_words_with_numbers : identity
+        line_as_numbers = modifier(line)
 
         # get string list of digitis
         digit_list = String([x for x in line_as_numbers if isdigit(x)])
