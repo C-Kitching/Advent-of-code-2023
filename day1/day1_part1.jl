@@ -1,4 +1,6 @@
+# main function
 function day1_part1()
+
     # read file
     file_path = "day1/day1.txt"
     file = open(file_path, "r")
@@ -23,5 +25,4 @@ function day1_part1()
 
     # print result
     println(sum(numeric_parts))
-
 end

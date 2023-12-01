@@ -1,4 +1,4 @@
-# function to convert words to numbers
+# recursive function to convert words to numbers
 function replace_words_with_numbers(s::AbstractString)
     s = replace(s,
         "twone" => "twoone",
@@ -23,7 +23,9 @@ end
 # function to combine first and last element in string
 firstLast(s::AbstractString) =  s[1] * s[end]
 
+# main function
 function day1_part2()
+    
     # read file
     file_path = "day1/day1.txt"
     file = open(file_path, "r")
@@ -56,6 +58,7 @@ function day1_part2()
 
     # print result
     println(sum(numeric_parts))
+
 end
 
 
