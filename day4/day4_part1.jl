@@ -3,7 +3,7 @@
 function day4_part1()
 
     # read data
-    lines = readlines("day4/day4.txt")
+    lines = readlines("input/day4.txt")
 
     # record score
     score = 0
