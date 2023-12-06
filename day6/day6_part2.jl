@@ -24,5 +24,3 @@ function day6_part2()
     println(number_ways_to_win)
 
 end
-
-day6_part2()
