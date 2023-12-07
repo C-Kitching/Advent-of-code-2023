@@ -8,27 +8,27 @@ function classify(hand::String)
     
     # 5 of a kind
     if 5 in counts
-        return 6
+        return 5
     # 4 of a kind
     elseif 4 in counts
-        return 5
+        return 4
     elseif 3 in counts
         # full house
         if 2 in counts
-            return 4
+            return 3.5
         # 3 of a kind
         else
             return 3
         end
     # two pair
     elseif count(x -> x == 2, counts) == 4
-        return 2
+        return 2.5
     # one pair
     elseif 2 in counts
-        return 1
+        return 2
     # high card
     else
-        return 0
+        return 1
     end
 
 end

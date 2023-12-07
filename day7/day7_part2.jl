@@ -1,36 +1,45 @@
 
 # map picture cards to letters
-# Joker is the weakest individual card
 letter_map = Dict('T'=>'A', 'J'=>'.', 'Q'=>'C', 'K'=>'D', 'A'=>'E')
 
 # classify the hand as 5 of a kind, 4 of a kind, etc.
 function classify(hand::String)
+
+    # count and remove jokers
+    jokers = count('J', hand)
+    hand = replace(hand, "J" => "")
+
+    # count number of same cards
     counts = [count(card, hand) for card in hand]
+
+    score = 0
     
     # 5 of a kind
     if 5 in counts
-        return 6
+        score = 5
     # 4 of a kind
     elseif 4 in counts
-        return 5
+        score = 4
     elseif 3 in counts
         # full house
         if 2 in counts
-            return 4
+            score = 3.5
         # 3 of a kind
         else
-            return 3
+            score = 3
         end
     # two pair
     elseif count(x -> x == 2, counts) == 4
-        return 2
+        score = 2.5
     # one pair
     elseif 2 in counts
-        return 1
+        score = 2
     # high card
     else
-        return 0
+        score = 1
     end
+
+    return score + jokers
 
 end
 
@@ -46,7 +55,7 @@ end
 function day7_part2()
 
     # read data
-    lines = readlines("input/day7_test.txt")
+    lines = readlines("input/day7.txt")
 
     # containers
     hands = Pair{String, Int}[]
