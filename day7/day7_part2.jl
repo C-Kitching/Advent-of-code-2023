@@ -34,8 +34,8 @@ function classify(hand::String)
     # one pair
     elseif 2 in counts
         score = 2
-    # high card
-    else
+    # high card not all jokers
+    elseif hand != ""
         score = 1
     end
 
