@@ -2,14 +2,10 @@
 using Statistics
 
 # apply alternating plus and minus to array
-function alt_plus_minus(nums)
+function alt_plus_minus(nums::Vector{Int}) :: Int
     res = nums[1]
     for i in 2:length(nums)
-        if i % 2 == 0
-            res -= nums[i]
-        else
-            res += nums[i]
-        end
+        res += (i%2 == 0 ? -nums[i] : nums[i])
     end
     return res
 end
@@ -41,6 +37,5 @@ function day9_part2()
 
     # print result
     println(res)
-
 
 end

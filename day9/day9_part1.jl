@@ -29,5 +29,4 @@ function day9_part1()
     # print result
     println(res)
 
-
 end
