@@ -111,5 +111,3 @@ function day10_part2()
     println(num_interior_points)
 
 end
-
-day10_part2()
