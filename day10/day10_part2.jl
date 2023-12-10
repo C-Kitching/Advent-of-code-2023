@@ -13,7 +13,7 @@ function reorder_coords(coords::Vector{Tuple{Int, Int}}) :: Vector{Tuple{Int, In
     return path
 end
 
-# calculate the number of interior points
+# calculate the number of interior points using Picks theorum
 function picks_theorum(area::Float64, boundary_nodes::Int) :: Int
     return Int(area - boundary_nodes/2 + 1)
 end
