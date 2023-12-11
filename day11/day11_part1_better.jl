@@ -1,6 +1,26 @@
 # packages
 using DataStructures
 
+# exapnd universe by addings rows and cols of .
+function expand_universe(empty_rows::Vector{Int}, empty_cols::Vector{Int}, 
+    universe::Vector{Vector{Char}}) :: Vector{Vector{Char}}
+    
+    # add rows
+    for row in empty_rows
+        insert!(universe, row, fill('.', length(universe[1])))
+    end
+
+    # add cols
+    for col in empty_cols
+        for row in universe
+            insert!(row, col+1, '.')
+        end
+    end
+
+    return universe
+end
+
+
 # find rows with no galaxies
 function find_empty_cols(universe::Vector{Vector{Char}}) :: Vector{Int}
 
@@ -40,8 +60,7 @@ function find_empty_rows(universe::Vector{Vector{Char}}) :: Vector{Int}
 end
 
 # find minimum distances between all pairs in the universe
-function find_min_dist_sum(universe::Vector{Vector{Char}},
-    empty_rows::Vector{Int}, empty_cols::Vector{Int}) :: Int
+function find_min_dist_sum(universe::Vector{Vector{Char}}) :: Int
 
     rows = length(universe)
     cols = length(universe[1])
@@ -64,10 +83,10 @@ function find_min_dist_sum(universe::Vector{Vector{Char}},
 end
 
 # main function
-function day11_part2()
+function day11_part1()
 
     # read data
-    lines = readlines("input/day11_test.txt")
+    lines = readlines("input/day11.txt")
 
     # put into universe
     universe = Vector{Vector{Char}}()
@@ -79,12 +98,13 @@ function day11_part2()
     empty_rows = find_empty_rows(universe)
     empty_cols = find_empty_cols(universe)
 
+    # exapnd universe
+    expanded_universe = expand_universe(empty_rows, empty_cols, universe)
+
     # find min distances between all pairs
-    min_dist_sum = find_min_dist_sum(universe, empty_rows, empty_cols)
+    min_dist_sum = find_min_dist_sum(expanded_universe)
 
     # print result
     println(min_dist_sum)
 
 end
-
-day11_part2()

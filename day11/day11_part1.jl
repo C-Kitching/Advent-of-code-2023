@@ -61,7 +61,7 @@ end
 
 # bfs to find min distance between two galaxies
 function bfs(start::Tuple{Int, Int}, goal::Tuple{Int, Int}, 
-    universe::Vector{Vector{Char}}) :: Int
+    rows::Int, cols::Int) :: Int
 
     # define directions
     dirs = [(1,0), (-1,0), (0,1), (0,-1)]
@@ -86,7 +86,7 @@ function bfs(start::Tuple{Int, Int}, goal::Tuple{Int, Int},
             next_pos = (curr[1]+dir[1],curr[2]+dir[2])
 
             # check not visited and in bounds
-            if 1 <= next_pos[1] <= rows && 1 <= next_pos[2] <= cols && next_pos ∉ visited_nodes
+            if 1 <= next_pos[1] <= rows && 1 <= next_pos[2] <= cols && next_pos ∉ visited
 
                 # visit and and to queue
                 push!(visited, next_pos)
@@ -105,17 +105,19 @@ function find_min_dist_sum(universe::Vector{Vector{Char}}) :: Int
     cols = length(universe[1])
 
     # find galaxies
-    galaxy_posisitons = [(i, j) for i in 1:rows for j in 1:cols if universe[i][j] == '#']
+    galaxy_positions = [(i, j) for i in 1:rows for j in 1:cols if universe[i][j] == '#']
+    N = length(galaxy_positions)
 
     # calc min distance for all pairs of galaxies
     distances = Dict()
-    for i in 1::length(galaxy_positions)
-        for j in (i+1)::length(galaxy_positions)
-            distance = bfs(galaxy_posisitons[i], galaxy_posisitons[j], universe)
-            distances[(galaxy_posisitons[i], galaxy_posisitons[j])] = distance
+    for i in 1:N
+        println(i/N*100)
+        for j in (i+1):N
+            distance = bfs(galaxy_positions[i], galaxy_positions[j], rows, cols)
+            distances[(galaxy_positions[i], galaxy_positions[j])] = distance
         end
     end
-
+    
     # sum all min distances
     min_dist_sum = 0
     for (_, dist) in pairs(distances)
@@ -129,7 +131,7 @@ end
 function day11_part1()
 
     # read data
-    lines = readlines("input/day11_test1.txt")
+    lines = readlines("input/day11.txt")
 
     # put into universe
     universe = Vector{Vector{Char}}()
@@ -151,5 +153,3 @@ function day11_part1()
     println(min_dist_sum)
 
 end
-
-day11_part1()
