@@ -81,20 +81,25 @@ function bfs(start::Tuple{Int, Int}, goal::Tuple{Int, Int},
             return dist
         end
 
+        # search all directions around
         for dir in dirs
+            next_pos = (curr[1]+dir[1],curr[2]+dir[2])
 
+            # check not visited and in bounds
+            if 1 <= next_pos[1] <= rows && 1 <= next_pos[2] <= cols && next_pos ∉ visited_nodes
 
-            
+                # visit and and to queue
+                push!(visited, next_pos)
+                push!(queue, (next_pos, dist+1))
+            end  
         end
-
-
     end
 
-
+    return Inf
 end
 
 # find minimum distances between all pairs in the universe
-function find_min_dist_pairs(universe::Vector{Vector{Char}})
+function find_min_dist_sum(universe::Vector{Vector{Char}}) :: Int
 
     rows = length(universe)
     cols = length(universe[1])
@@ -111,6 +116,13 @@ function find_min_dist_pairs(universe::Vector{Vector{Char}})
         end
     end
 
+    # sum all min distances
+    min_dist_sum = 0
+    for (_, dist) in pairs(distances)
+        min_dist_sum += dist
+    end
+
+    return min_dist_sum
 end
 
 # main function
@@ -133,8 +145,10 @@ function day11_part1()
     expanded_universe = expand_universe(empty_rows, empty_cols, universe)
 
     # find min distances between all pairs
-    min_dists = find_min_dist_pairs(expanded_universe)
+    min_dist_sum = find_min_dist_sum(expanded_universe)
 
+    # print result
+    println(min_dist_sum)
 
 end
 
