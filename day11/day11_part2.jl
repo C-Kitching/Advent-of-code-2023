@@ -39,6 +39,32 @@ function find_empty_rows(universe::Vector{Vector{Char}}) :: Vector{Int}
     return empty_rows
 end
 
+# count the number of empty cols and rows between two points
+function count_empty_cols_and_rows(p1::Tuple{Int, Int}, p2::Tuple{Int, Int},
+    empty_rows::Vector{Int}, empty_cols::Vector{Int}) :: Int
+
+    # get boundaries
+    min_row = min(p1[1], p2[1])
+    max_row = max(p1[1], p2[1])
+    min_col = min(p1[2], p2[2])
+    max_col = max(p1[2], p2[2])
+
+    # count empty rows and cols between points
+    res = 0
+    for empty_row in empty_rows
+        if min_row < empty_row < max_row
+            res += 1
+        end
+    end
+    for empty_col in empty_cols
+        if min_col < empty_col < max_col
+            res += 1
+        end
+    end
+
+    return res
+end
+
 # find minimum distances between all pairs in the universe
 function find_min_dist_sum(universe::Vector{Vector{Char}},
     empty_rows::Vector{Int}, empty_cols::Vector{Int}) :: Int
@@ -56,7 +82,16 @@ function find_min_dist_sum(universe::Vector{Vector{Char}},
         galaxy1 = galaxy_positions[i]
         for j in (i+1):N
             galaxy2 = galaxy_positions[j]
-            min_dist_sum += abs(galaxy1[1] - galaxy2[1]) + abs(galaxy1[2] - galaxy2[2])
+
+            # distance with no expansion
+            raw_distance = abs(galaxy1[1] - galaxy2[1]) + abs(galaxy1[2] - galaxy2[2])
+
+            # determine how many empty cols and rows between the galaxies
+            empty = count_empty_cols_and_rows(galaxy1, galaxy2, empty_rows, empty_cols)
+
+            # cal distance with expansion
+            min_dist_sum += (raw_distance - empty) + empty*1e6
+
         end
     end
     
@@ -67,7 +102,7 @@ end
 function day11_part2()
 
     # read data
-    lines = readlines("input/day11_test.txt")
+    lines = readlines("input/day11.txt")
 
     # put into universe
     universe = Vector{Vector{Char}}()
@@ -86,5 +121,3 @@ function day11_part2()
     println(min_dist_sum)
 
 end
-
-day11_part2()
