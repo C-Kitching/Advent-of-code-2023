@@ -1,4 +1,6 @@
 
+memory = Dict()
+
 # count number of valid configurations
 function count(config::AbstractString, nums::Tuple{Vararg{Int}}) :: Int
 
@@ -14,6 +16,12 @@ function count(config::AbstractString, nums::Tuple{Vararg{Int}}) :: Int
         # 0 not valid config if broken springs left but not expecting more broken springs
         # 1 valid config if no more broken springs
         return '#' ∈ config ? 0 : 1
+    end
+
+    # check memory for this configuration
+    key = (config, nums)
+    if haskey(memory, key)
+        return memory[key]
     end
 
     result = 0
@@ -36,6 +44,9 @@ function count(config::AbstractString, nums::Tuple{Vararg{Int}}) :: Int
         end
     end
 
+    # save result in memory
+    memory[key] = result
+
     return result
 end
 
@@ -51,12 +62,13 @@ function day12_part1()
     for line in lines
 
         # read springs
-        config = split(line, " ")[1]
+        config = join(fill(split(line, " ")[1], 5), "?")
 
         # read nums part
         number_string = split(line, " ")[2]
         number_parts = split(number_string, ",")
-        nums = Tuple(map(x -> parse(Int, x), number_parts))
+        nums_arr = parse.(Int, number_parts)
+        nums = Tuple(repeat(nums_arr, 5))
 
         # calculate possible configurations
         res += count(config, nums)
@@ -67,5 +79,3 @@ function day12_part1()
     println(res)
 
 end
-
-day12_part1()
