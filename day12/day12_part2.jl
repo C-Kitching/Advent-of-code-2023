@@ -1,4 +1,5 @@
 
+# memory for DP
 memory = Dict()
 
 # count number of valid configurations
