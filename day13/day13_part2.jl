@@ -94,5 +94,3 @@ function day13_part2()
     println(res)
 
 end
-
-day13_part2()
