@@ -3,7 +3,7 @@
 using DataStructures
 
 # roll all rocks in grid to their north most point
-function push_north!(grid::Vector{Vector{Char}})
+function push_north(grid::Vector{Vector{Char}}) :: Vector{Vector{Char}}
 
     # go through all columns
     for col in eachindex(grid[1])
@@ -35,6 +35,8 @@ function push_north!(grid::Vector{Vector{Char}})
 
         end
     end
+
+    return grid
 end
 
 # rotate grid clockwise 90 degrees
@@ -68,18 +70,55 @@ function calculate_load(grid::Vector{Vector{Char}}) :: Int
 end
 
 # perform a cycle, i.e N -> W -> S -> E
-function cycle!(grid::Vector{Vector{Char}}) :: Vector{Vector{Char}}
+function cycle(grid::Vector{Vector{Char}}) :: Vector{Vector{Char}}
 
-    push_north!(grid)
+    grid = push_north(grid)
     for _ in 1:3
         grid = rotate_clockwise_90(grid)
-        push_north!(grid)
+        grid = push_north(grid)
     end
     grid = rotate_clockwise_90(grid)
 
     return grid
 
 end
+
+# perform N cycles on the grid
+function N_cycles(grid::Vector{Vector{Char}}, N::Int) :: Vector{Vector{Char}}
+
+    # memorisation
+    memo = Dict()
+
+    # cycle through
+    num_cycles = 0
+    while true
+
+        # perform one cycle
+        grid = cycle(grid)
+        num_cycles += 1
+        
+        # reach N cycles before repeating
+        if num_cycles == N
+            return grid
+
+        # check if we've seen this before by comparing contents
+        elseif any(memo_grid -> isequal(memo_grid, grid), values(memo))
+            break
+
+        # store in memory (deep copy to store the grid's current state)
+        else
+            memo[num_cycles] = deepcopy(grid)
+        end
+    end
+
+    if N%length(memo) == 0
+        return memo[length(memo)]
+    else
+        return memo[N%length(memo)]
+    end
+
+end
+
 
 # main function
 function day14_part1()
@@ -91,10 +130,7 @@ function day14_part1()
         push!(grid, collect(line))
     end
 
-    # transform grid
-    grid = cycle!(grid)
-
-    println(grid)
+    cycled_grid = N_cycles(grid, 10)
 
 end
 
