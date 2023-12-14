@@ -72,12 +72,10 @@ end
 # perform a cycle, i.e N -> W -> S -> E
 function cycle(grid::Vector{Vector{Char}}) :: Vector{Vector{Char}}
 
-    grid = push_north(grid)
-    for _ in 1:3
-        grid = rotate_clockwise_90(grid)
+    for _ in 1:4
         grid = push_north(grid)
+        grid = rotate_clockwise_90(grid)
     end
-    grid = rotate_clockwise_90(grid)
 
     return grid
 
@@ -124,13 +122,20 @@ end
 function day14_part1()
 
     # read data
-    lines = readlines("input/day14_test.txt")
+    lines = readlines("input/day14_test1.txt")
     grid = Vector{Vector{Char}}()
     for line in lines
         push!(grid, collect(line))
     end
 
-    cycled_grid = N_cycles(grid, 10)
+    # cycle grid 1 bilion times
+    cycled_grid = N_cycles(grid, 100)
+
+    # compute load on north wall
+    load = calculate_load(cycled_grid)
+
+    # print result
+    println(load)
 
 end
 
