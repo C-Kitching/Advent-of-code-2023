@@ -3,7 +3,7 @@
 using DataStructures
 
 # roll all rocks in grid to their north most point
-function push_north(grid::Vector{Vector{Char}}) :: Vector{Vector{Char}}
+function push_north!(grid::Vector{Vector{Char}})
 
     # go through all columns
     for col in eachindex(grid[1])
@@ -35,23 +35,31 @@ function push_north(grid::Vector{Vector{Char}}) :: Vector{Vector{Char}}
 
         end
     end
-
-    return grid
 end
 
-# rotate grid clockwise 90 degrees
-function rotate_clockwise_90(mat::Vector{Vector{Char}})
-    nrows = length(mat)
-    ncols = length(mat[1])
-    new_mat = [Vector{Char}(undef, nrows) for _ in 1:ncols]
+# rotate grid 90 degrees clockwise
+function rotate_matrix!(matrix::Vector{Vector{Char}})
+    n = length(matrix)
+    for layer in 1:div(n, 2)
+        first = layer
+        last = n - layer + 1
+        for i in first:last-1
+            offset = i - first
+            top = matrix[first][i]  # save top
 
-    for i in 1:nrows
-        for j in 1:ncols
-            new_mat[j][nrows - i + 1] = mat[i][j]
+            # left -> top
+            matrix[first][i] = matrix[last-offset][first]
+
+            # bottom -> left
+            matrix[last-offset][first] = matrix[last][last-offset]
+
+            # right -> bottom
+            matrix[last][last-offset] = matrix[i][last]
+
+            # top -> right
+            matrix[i][last] = top
         end
     end
-
-    return new_mat
 end
 
 # calculate load on north wall
@@ -70,11 +78,11 @@ function calculate_load(grid::Vector{Vector{Char}}) :: Int
 end
 
 # perform a cycle, i.e N -> W -> S -> E
-function cycle(grid::Vector{Vector{Char}}) :: Vector{Vector{Char}}
+function cycle!(grid::Vector{Vector{Char}}) :: Vector{Vector{Char}}
 
     for _ in 1:4
-        grid = push_north(grid)
-        grid = rotate_clockwise_90(grid)
+        push_north!(grid)
+        rotate_matrix!(grid)
     end
 
     return grid
@@ -85,51 +93,52 @@ end
 function N_cycles(grid::Vector{Vector{Char}}, N::Int) :: Vector{Vector{Char}}
 
     # memorisation
-    memo = Dict()
+    memo = Dict{String, Int}()
+    memo[join(join.(grid))] = 0
 
-    # cycle through
-    num_cycles = 0
-    while true
+    # find cycle length
+    cycle_start = cycle_end = 0
+    for i in 1:N
 
         # perform one cycle
-        grid = cycle(grid)
-        num_cycles += 1
-        
-        # reach N cycles before repeating
-        if num_cycles == N
-            return grid
+        grid = cycle!(grid)
+        s = join(join.(grid))
 
-        # check if we've seen this before by comparing contents
-        elseif any(memo_grid -> isequal(memo_grid, grid), values(memo))
+        # found start of cycle
+        if haskey(memo, s)
+            cycle_start = memo[s]
+            cycle_end = i
             break
-
-        # store in memory (deep copy to store the grid's current state)
-        else
-            memo[num_cycles] = deepcopy(grid)
         end
+
+        # store in memory
+        memo[s] = i
+    end
+    empty!(memo)
+
+    # perform remaining steps in cycle
+    steps_left = mod(N-cycle_end, cycle_end-cycle_start)
+    for _ ∈ 1:steps_left
+        grid = cycle!(grid)
     end
 
-    if N%length(memo) == 0
-        return memo[length(memo)]
-    else
-        return memo[N%length(memo)]
-    end
+    return grid
 
 end
 
 
 # main function
-function day14_part1()
+function day14_part2()
 
     # read data
-    lines = readlines("input/day14_test1.txt")
+    lines = readlines("input/day14.txt")
     grid = Vector{Vector{Char}}()
     for line in lines
         push!(grid, collect(line))
     end
 
     # cycle grid 1 bilion times
-    cycled_grid = N_cycles(grid, 100)
+    cycled_grid = N_cycles(grid, 1000000000)
 
     # compute load on north wall
     load = calculate_load(cycled_grid)
@@ -138,5 +147,3 @@ function day14_part1()
     println(load)
 
 end
-
-day14_part1()
