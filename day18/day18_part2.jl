@@ -28,15 +28,15 @@ function shoelace_area(coords::Vector{Tuple{Int, Int}}) :: Float64
 end
 
 # calculate dig area given the coords of the dig path
-function dig_area(path::Vector{Tuple{Int, Int}}) :: Int
+function dig_area(path::Vector{Tuple{Int, Int}}, num_boundary_points::Int) :: Int
 
     # calculate area with shoelace formula
     A = shoelace_area(path)
 
     # calc num of interior points with Picks theorum
-    num_interior_points = picks_theorum(A, length(path))
+    num_interior_points = picks_theorum(A, num_boundary_points)
 
-    return length(path) + num_interior_points
+    return num_boundary_points + num_interior_points
 
 end
 
@@ -47,7 +47,7 @@ function day18_part2()
     num_to_dir = Dict(0 => 'R', 1 => 'D', 2 => 'L', 3 => 'U')
 
     # read data
-    lines = readlines("input/day18_test.txt")
+    lines = readlines("input/day18.txt")
     moves = Vector{Pair{Char, Int}}()
     for line in lines
         num = parse(Int, split(line)[3][3:end-2], base = 16)
@@ -62,6 +62,9 @@ function day18_part2()
     # map directions to co-ords
     dirs = Dict('R' => (0, 1), 'L' => (0, -1), 'U' => (-1, 0), 'D' => (1, 0)) 
 
+    # track boundary points
+    num_boundary_points = 0
+
     # perform all moves
     for move in moves
 
@@ -70,22 +73,20 @@ function day18_part2()
         dr, dc = dir[1], dir[2] # row and column changes for that direction
         num_steps = move.second # number of steps to perform
 
-        # move that number of steps in that direction
-        for _ in 1:num_steps
-            next_pos = (curr_pos[1] + dr, curr_pos[2] + dc)
-            push!(coords, next_pos)
-            curr_pos = next_pos
-        end
+        # get next point on polygon
+        next_pos = (curr_pos[1] + dr*num_steps, curr_pos[2] + dc*num_steps)
+        push!(coords, next_pos)
+
+        # add boundary points
+        num_boundary_points += num_steps 
 
     end
     coords = coords[1:end-1] # slice off last point as we go in a loop
 
     # calculate total dig area
-    A = dig_area(coords)
+    A = dig_area(coords, num_boundary_points)
 
     # print result
     println(A)
 
 end
-
-day18_part2()
