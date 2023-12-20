@@ -9,7 +9,7 @@ function read_data()
     conjunction_mods = Dict{String, Vector{String}}()
     broadcaster = Vector{String}()
 
-    lines = readlines("input/day20_test1.txt")
+    lines = readlines("input/day20.txt")
     for line in lines
 
         # flip flop
@@ -64,7 +64,7 @@ function initialise_conjunction_memory(
         for dest in conjunction_mods[conjunction_mod]
             if dest in keys(conjunction_mods)
                 if dest in keys(conjunction_input)
-                    conjunction_input[dest][conjunction_mode] = "low"
+                    conjunction_input[dest][conjunction_mod] = "low"
                 else
                     conjunction_input[dest] = Dict(conjunction_mod => "low")
                 end
@@ -84,9 +84,11 @@ function count_pulses(
     conjunction_input::Dict{String, Dict{String, String}},
     flip_flop_states::Dict{String, Int}, max_pushes::Int) :: Tuple{Int, Int}
 
-    total_low = total_high = 0 # total pushes
+    # track pulses
+    pulse_counts = Vector{Tuple{Int, Int}}()
 
     # push button however many times
+    count = 1
     for i in 1:max_pushes
 
         # destination, signal type
@@ -106,7 +108,15 @@ function count_pulses(
             # broadcast signal
             if curr == "broadcaster"
                 for dest in broadcaster
-                    push!(q, (dest, signal))
+
+                    # module has to be typed
+                    if dest ∈ keys(flip_flop_mods) || dest ∈ keys(conjunction_input)
+                        # update memory if conjunction mod
+                        if dest ∈ keys(conjunction_mods)
+                            conjunction_input[dest][curr] = signal
+                        end
+                        push!(q, (dest, signal))
+                    end
                 end
 
                 # update counts
@@ -125,11 +135,14 @@ function count_pulses(
                     # on, turn off and send low
                     if flip_flop_states[curr] == 1
                         for dest in flip_flop_mods[curr]
-                            push!(q, (dest, "low"))
 
-                            # if dest is a conjunction mod, then update memory
-                            if dest in keys(conjunction_mods)
-                                conjunction_input[dest][curr] = "low"
+                            # module has to be typed
+                            if dest ∈ keys(flip_flop_mods) || dest ∈ keys(conjunction_input)
+                                # update memory if conjunction mod
+                                if dest ∈ keys(conjunction_mods)
+                                    conjunction_input[dest][curr] = "low"
+                                end
+                                push!(q, (dest, "low"))
                             end
 
                         end
@@ -140,11 +153,14 @@ function count_pulses(
                     # off, turn on and send high
                     else
                         for dest in flip_flop_mods[curr]
-                            push!(q, (dest, "high"))
 
-                            # if dest is a conjunction mod, then update memory
-                            if dest in keys(conjunction_mods)
-                                conjunction_input[dest][curr] = "high"
+                            # module has to be typed
+                            if dest ∈ keys(flip_flop_mods) || dest ∈ keys(conjunction_input)
+                                # update memory if conjunction mod
+                                if dest ∈ keys(conjunction_mods)
+                                    conjunction_input[dest][curr] = "high"
+                                end
+                                push!(q, (dest, "high"))
                             end
 
                         end
@@ -165,7 +181,15 @@ function count_pulses(
                 # if all memory is high, send low
                 if all(state == "high" for state in values(conjunction_input[curr]))
                     for dest in conjunction_mods[curr]
-                        push!(q, (dest, "low"))
+
+                        # module has to be typed
+                        if dest ∈ keys(flip_flop_mods) || dest ∈ keys(conjunction_input)
+                            # update memory if conjunction mod
+                            if dest ∈ keys(conjunction_mods)
+                                conjunction_input[dest][curr] = "low"
+                            end
+                            push!(q, (dest, "low"))
+                        end
 
                         # update counts
                         low_pulses += length(conjunction_mods[curr])
@@ -174,7 +198,15 @@ function count_pulses(
                 # if all memory is low, send high
                 else
                     for dest in conjunction_mods[curr]
-                        push!(q, (dest, "high"))
+
+                        # module has to be typed
+                        if dest ∈ keys(flip_flop_mods) || dest ∈ keys(conjunction_input)
+                            # update memory if conjunction mod
+                            if dest ∈ keys(conjunction_mods)
+                                conjunction_input[dest][curr] = "high"
+                            end
+                            push!(q, (dest, "high"))
+                        end
 
                         # update counts
                         high_pulses += length(conjunction_mods[curr])
@@ -185,16 +217,32 @@ function count_pulses(
         end
 
         # track counts
-        total_low += low_pulses
-        total_high += high_pulses
+        count += 1
+        push!(pulse_counts, (low_pulses, high_pulses))
 
         # if back to starting state
-        if (all(state == 1 for state in values(flip_flop_states)) 
+        if (all(state == -1 for state in values(flip_flop_states)) 
             && all(all(value == "low" for (_, value) in d) for (_, d) in conjunction_input))
+            x = 5
             break
         end
         
     end
+
+    # fill the reaminder
+    N = length(pulse_counts)
+    tracker = 1
+    for _ in count:max_pushes
+        push!(pulse_counts, pulse_counts[tracker])
+        tracker += 1
+        if tracker > N
+            tracker = 1
+        end
+    end
+
+    # get totals
+    total_low = sum(map(pair -> pair[1], pulse_counts))
+    total_high = sum(map(pair -> pair[2], pulse_counts))
 
     return total_low, total_high
 
