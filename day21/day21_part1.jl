@@ -1,12 +1,12 @@
 
+# packages
+using DataStructures
 
 # main function
 function day21_part1()
 
-    moves = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-
     # read data
-    lines = readlines("input/day21_test.txt")
+    lines = readlines("input/day21.txt")
     grid = Vector{Vector{Char}}()
     for line in lines
         push!(grid, collect(line))
@@ -14,41 +14,53 @@ function day21_part1()
     R = length(grid)
     C = length(grid[1])
 
-    # build adj matrix
-    A = [[0 for _ in 1:R*C] for _ in 1:R*C]
-    for i in 1:R
-        for j in (i+1):C
-
-            node_num = (i-1)*C + (j-1)
-
-            for move in moves
-                new_pos = (i+move[1], j+move[2])
-
-                # boudns check
-                if 1 ≤ new_pos[1] ≤ R && 1 ≤ new_pos[2] ≤ C
-
-                    # if we could move there
-                    if grid[new_pos[1]][new_pos[2]] ≠ '#'
-
-                        neighbour_num = (new_pos[1] - 1)*C + new_pos[2]
-
-                        A[node_num][neighbour_num] = 1
-                        A[neighbour_num][node_num] = 1
-                    end
-                end
+    # find start pos
+    sr = sc = 0
+    for (r, row) in enumerate(grid)
+        for (c, char) in enumerate(row)
+            if char == 'S'
+                sr = r
+                sc = c
+                break
             end
         end
     end
 
-    # convert to matrix
-    
+    ans = Set{Tuple{Int, Int}}() # set of visitable nodes
+    seen = Set{Tuple{Int, Int}}() # mark seen nodes
 
+    # initialise queue with (row, col, steps left)
+    q = Deque{Tuple{Int, Int, Int}}()
+    push!(q, (sr, sc, 64))
 
+    # bfs
+    while !isempty(q)
 
+        # get next items
+        row, col, steps = popfirst!(q)
 
+        # if we have an even number of steps left then this node is visitable
+        if steps%2 == 0
+            push!(ans, (row, col))
+        end
 
+        # no more steps left
+        if steps == 0
+            continue
+        end
 
+        # check all neighbours
+        for (nr, nc) ∈ [(row+1, col), (row-1, col), (row, col+1), (row, col-1)]
+
+            # skip out of bounds, rocks or seen nodes
+            if 1 ≤ nr ≤ R && 1 ≤ nc ≤ C && grid[nr][nc] ≠ '#' && (nr, nc) ∉ seen
+                push!(seen, (nr, nc))
+                push!(q, (nr, nc, steps-1))
+            end
+        end
+    end
+
+    # print result
+    println(length(ans))
 
 end
-
-day21_part1()
