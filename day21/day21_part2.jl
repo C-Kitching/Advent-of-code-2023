@@ -2,7 +2,7 @@
 # packages
 using DataStructures
 
-function fill(sr::Int, sc::Int, steps::Int, 
+function fill(sr::Int, sc::Int, R::Int, C::Int, steps::Int, 
     grid::Vector{Vector{Char}}) :: Int
 
     ans = Set{Tuple{Int, Int}}() # set of visitable nodes
@@ -10,7 +10,7 @@ function fill(sr::Int, sc::Int, steps::Int,
 
     # initialise queue with (row, col, steps left)
     q = Deque{Tuple{Int, Int, Int}}()
-    push!(q, (sr, sc, 64))
+    push!(q, (sr, sc, steps))
 
     # bfs
     while !isempty(q)
@@ -67,6 +67,8 @@ function day21_part2()
         end
     end
 
+    # print result
+    println(fill(sr, sc, R, C, 64, grid))
 
 end
 
