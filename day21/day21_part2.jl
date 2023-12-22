@@ -54,6 +54,7 @@ function day21_part2()
     end
     R = length(grid)
     C = length(grid[1])
+    size = length(grid)
 
     # find start pos
     sr = sc = 0
@@ -67,8 +68,52 @@ function day21_part2()
         end
     end
 
+    # num of steps to take
+    steps = 26501365
+
+    # assume grid square
+    @assert R == C
+
+    # assume that we start in the middle
+    @assert sr == sc == Int(ceil(size/2))
+
+    # assume steps is exactly a whole grid number plus extra half
+    @assert steps%size == Int(floor(size/2))
+
+    # get grid width
+    grid_width = Int(floor(steps/size) - 1)
+
+    # number of odd and even grids
+    odd = Int((floor(grid_width/2)*2 + 1)^2)
+    even = Int((floor((grid_width + 1)/2)*2)^2)
+
+    # number of points in odd and even grids
+    odd_points = fill(sr, sc, R, C, Int(size*2+1), grid)
+    even_points = fill(sr, sc, R, C, Int(size*2), grid)
+
+    # corner points
+    top_corner = fill(size-1, sc, R, C, Int(size-1), grid)
+    right_corner = fill(sr, 0, R, C, Int(size-1), grid)
+    bottom_corner = fill(0, sc, R, C, Int(size-1), grid)
+    left_corner = fill(sr, size-1, R, C, Int(size-1), grid)
+
+    small_top_right = fill(size-1, 0, R, C, Int(floor(size/2)-1), grid)
+    small_bottom_right = fill(size-1, size-1, R, C, Int(floor(size/2)-1), grid)
+    small_top_left = fill(0, 0, R, C, Int(floor(size/2)-1), grid)
+    small_bottom_left = fill(0, size-1, R, C, Int(floor(size/2)-1), grid)
+
+    large_top_right = fill(size - 1, 0, R, C, Int(floor(size*3/2) - 1), grid)
+    large_top_left = fill(size - 1, size - 1, R, C, Int(floor(size*3/2) - 1), grid)
+    large_bottom_right = fill(0, 0, R, C, Int(floor(size*3/2) - 1), grid)
+    large_bottom_left = fill(0, size - 1, R, C, Int(floor(size*3/2) - 1), grid)
+
     # print result
-    println(fill(sr, sc, R, C, 64, grid))
+    print(
+        odd*odd_points + even*even_points +
+        top_corner + right_corner + bottom_corner + left_corner +
+        (grid_width + 1) + (small_top_right + small_bottom_right + small_top_left + small_bottom_left) + 
+        grid_width * (large_top_right + large_top_left + large_bottom_right + large_bottom_left)
+    )
 
 end
 
