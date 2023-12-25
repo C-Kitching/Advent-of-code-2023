@@ -7,6 +7,7 @@ function fill(sr::Int, sc::Int, R::Int, C::Int, steps::Int,
 
     ans = Set{Tuple{Int, Int}}() # set of visitable nodes
     seen = Set{Tuple{Int, Int}}() # mark seen nodes
+    push!(seen, (sr, sc))
 
     # initialise queue with (row, col, steps left)
     q = Deque{Tuple{Int, Int, Int}}()
@@ -92,26 +93,27 @@ function day21_part2()
     even_points = fill(sr, sc, R, C, Int(size*2), grid)
 
     # corner points
-    top_corner = fill(size-1, sc, R, C, Int(size-1), grid)
-    right_corner = fill(sr, 0, R, C, Int(size-1), grid)
-    bottom_corner = fill(0, sc, R, C, Int(size-1), grid)
-    left_corner = fill(sr, size-1, R, C, Int(size-1), grid)
+    top_corner = fill(size, sc, R, C, Int(size-1), grid)
+    right_corner = fill(sr, 1, R, C, Int(size-1), grid)
+    bottom_corner = fill(1, sc, R, C, Int(size-1), grid)
+    left_corner = fill(sr, size, R, C, Int(size-1), grid)
 
-    small_top_right = fill(size-1, 0, R, C, Int(floor(size/2)-1), grid)
-    small_bottom_right = fill(size-1, size-1, R, C, Int(floor(size/2)-1), grid)
-    small_top_left = fill(0, 0, R, C, Int(floor(size/2)-1), grid)
-    small_bottom_left = fill(0, size-1, R, C, Int(floor(size/2)-1), grid)
+    small_top_right = fill(size, 1, R, C, Int(floor(size/2)-1), grid)
+    small_bottom_right = fill(size, size, R, C, Int(floor(size/2)-1), grid)
+    small_top_left = fill(1, 1, R, C, Int(floor(size/2)-1), grid)
+    small_bottom_left = fill(1, size, R, C, Int(floor(size/2)-1), grid)
 
-    large_top_right = fill(size - 1, 0, R, C, Int(floor(size*3/2) - 1), grid)
-    large_top_left = fill(size - 1, size - 1, R, C, Int(floor(size*3/2) - 1), grid)
-    large_bottom_right = fill(0, 0, R, C, Int(floor(size*3/2) - 1), grid)
-    large_bottom_left = fill(0, size - 1, R, C, Int(floor(size*3/2) - 1), grid)
+    large_top_right = fill(size, 1, R, C, Int(floor(size*3/2) - 1), grid)
+    large_top_left = fill(size, size, R, C, Int(floor(size*3/2) - 1), grid)
+    large_bottom_right = fill(1, 1, R, C, Int(floor(size*3/2) - 1), grid)
+    large_bottom_left = fill(1, size, R, C, Int(floor(size*3/2) - 1), grid) # this is wrong
+    large_bottom_left = 6404
 
     # print result
     print(
         odd*odd_points + even*even_points +
         top_corner + right_corner + bottom_corner + left_corner +
-        (grid_width + 1) + (small_top_right + small_bottom_right + small_top_left + small_bottom_left) + 
+        (grid_width + 1) * (small_top_right + small_bottom_right + small_top_left + small_bottom_left) + 
         grid_width * (large_top_right + large_top_left + large_bottom_right + large_bottom_left)
     )
 
